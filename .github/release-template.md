@@ -20,5 +20,5 @@ This release comes with binaries for the AmigaOS4/PPC and AmigaOS3/m68k platform
 Please find the necessary installation archive as a lha archive file attached to this release. The SHA256 checksum for it is:
 
 ```
-XXXX PUT SHA256SUM HERE!
+${SHA256SUM}
 ```
