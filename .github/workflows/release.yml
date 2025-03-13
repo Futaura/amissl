@@ -28,8 +28,6 @@ jobs:
         REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
         echo "name=version::${VERSION}.${REVISION}" >> $GITHUB_ENV
         echo "name=date::${BUILD_DATE}" >> $GITHUB_ENV
-        echo "name=version::${VERSION}.${REVISION}"
-        echo "name=date::${BUILD_DATE}"
 
     - name: Get previous tag
       id: previoustag
@@ -57,7 +55,7 @@ jobs:
       id: release_drafter
       uses: ncipollo/release-action@v1.16.0
       with:
-        tag: ${{ env.version }}
+        #tag: ${{ env.version }}
         name: 'AmiSSL ${{ env.version }}'
         bodyFile: /tmp/release-template.md
         draft: true
