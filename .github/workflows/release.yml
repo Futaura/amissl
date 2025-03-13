@@ -51,7 +51,7 @@ jobs:
         export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
         envsubst <.github/release-template.md >/tmp/release-template.md
 
-    - name: Create release draft
+    - name: Create release draft ${{ env.version }}
       id: release_drafter
       uses: ncipollo/release-action@v1.16.0
       with:
