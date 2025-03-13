@@ -28,6 +28,8 @@ jobs:
         REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
         echo "name=version::${VERSION}.${REVISION}" >> $GITHUB_ENV
         echo "name=date::${BUILD_DATE}" >> $GITHUB_ENV
+        echo "name=version::${VERSION}.${REVISION}"
+        echo "name=date::${BUILD_DATE}"
 
     - name: Get previous tag
       id: previoustag
@@ -51,7 +53,7 @@ jobs:
         export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
         envsubst <.github/release-template.md >/tmp/release-template.md
 
-    - name: Create release draft ${{ env.version }}
+    - name: Create release draft
       id: release_drafter
       uses: ncipollo/release-action@v1.16.0
       with:
