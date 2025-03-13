@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-      version: ${{ steps.outputs.env.version }}
-      date: ${{ steps.output.env.date }}
+      version: ${{ steps.env.outputs.version }}
+      date: ${{ steps.env.outputs.date }}
 
     steps:
     - name: Checkout Code
