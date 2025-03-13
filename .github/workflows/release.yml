@@ -26,14 +26,14 @@ jobs:
         BUILD_DATE=$(date +%Y%m%d)
         VERSION=$(grep ^VERSION= Makefile | awk -F= '{ print $2 }')
         REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
-        echo "name=version::${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
-        echo "name=date::${BUILD_DATE}" >> $GITHUB_OUTPUT
+        echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
+        echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
 
     - name: Debug
       shell: bash
       run: |
-        echo "1 : ${{ steps.env.version }}"
-        echo "2 : ${{ steps.env.date }}"
+        echo "1 : ${{ steps.env.outputs.version }}"
+        echo "2 : ${{ steps.env.outputs.date }}"
         echo "3 : ${{ steps.outputs.version }}"
         echo "4 : ${{ steps.outputs.date }}"
         
