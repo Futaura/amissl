@@ -51,8 +51,8 @@ jobs:
         envsubst <.github/release-template.md >/tmp/release-template.md
     
     - name: Debug
-        shell: bash
-        run: |
+      shell: bash
+      run: |
         echo ${{ steps.env.outputs.version }}
         echo ${{ steps.env.outputs.date }}
         
