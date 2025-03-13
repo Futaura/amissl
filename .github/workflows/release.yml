@@ -114,40 +114,40 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: |
-          AmiSSL-${{ needs.release_draft.outputs.version }}.lha
-          AmiSSL-${{ needs.release_draft.outputs.version }}.lha.sha256
-          AmiSSL-${{ needs.release_draft.outputs.version }}.readme
+          AmiSSL-${{ needs.release_draft.outputs.version }}-OS3.lha
+          AmiSSL-${{ needs.release_draft.outputs.version }}-OS4.lha
+          AmiSSL-${{ needs.release_draft.outputs.version }}-SDK.lha
         name: AmiSSL-${{ needs.release_draft.outputs.version }}-${{ env.GITHUB_SHA7 }}
       continue-on-error: true
 
     #######################
     # release uploads
-    - name: Upload release archive
+    - name: Upload release archive [os3]
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.release_draft.outputs.upload_url }}
-        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}.lha
-        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}.lha
+        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-OS3.lha
+        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-OS3.lha
         asset_content_type: application/x-lha
 
-    - name: Upload release archive [sha256]
+    - name: Upload release archive [os4]
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.release_draft.outputs.upload_url }}
-        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}.lha.sha256
-        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}.lha.sha256
+        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-OS4.lha
+        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-OS4.lha
         asset_content_type: text/plain
 
-    - name: Upload release archive [readme]
+    - name: Upload release archive [sdk]
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.release_draft.outputs.upload_url }}
-        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}.readme
-        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}.readme
+        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-SDK.lha
+        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-SDK.lha
         asset_content_type: text/plain
