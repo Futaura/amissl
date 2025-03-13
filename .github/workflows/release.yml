@@ -29,14 +29,6 @@ jobs:
         echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
         echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
 
-    - name: Debug
-      shell: bash
-      run: |
-        echo "1 : ${{ steps.env.outputs.version }}"
-        echo "2 : ${{ steps.env.outputs.date }}"
-        echo "3 : ${{ steps.outputs.version }}"
-        echo "4 : ${{ steps.outputs.date }}"
-        
     - name: Get previous tag
       id: previoustag
       uses: WyriHaximus/github-action-get-previous-tag@v1.4
@@ -46,6 +38,7 @@ jobs:
       uses: metcalfc/changelog-generator@v4.3.1
       with:
         myToken: ${{ secrets.GITHUB_TOKEN }}
+        base-ref: 4.12
 
     - name: Generate release notes
       shell: bash
