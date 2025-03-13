@@ -32,8 +32,8 @@ jobs:
     - name: Debug
       shell: bash
       run: |
-        echo "1 : ${{ steps.env.outputs.version }}"
-        echo "2 : ${{ steps.env.outputs.date }}"
+        echo "1 : ${{ steps.env.version }}"
+        echo "2 : ${{ steps.env.date }}"
         echo "3 : ${{ steps.outputs.version }}"
         echo "4 : ${{ steps.outputs.date }}"
         
