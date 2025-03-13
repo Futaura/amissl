@@ -26,8 +26,8 @@ jobs:
         BUILD_DATE=$(date +%Y%m%d)
         VERSION=$(grep ^VERSION= Makefile | awk -F= '{ print $2 }')
         REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
-        echo "name=version::${VERSION}.${REVISION}" >> $GITHUB_ENV
-        echo "name=date::${BUILD_DATE}" >> $GITHUB_ENV
+        echo "name=version::${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
+        echo "name=date::${BUILD_DATE}" >> $GITHUB_OUTPUT
 
     - name: Get previous tag
       id: previoustag
@@ -38,7 +38,7 @@ jobs:
       uses: metcalfc/changelog-generator@v4.3.1
       with:
         myToken: ${{ secrets.GITHUB_TOKEN }}
-        base-ref: 4.12
+#        base-ref: 4.12
 
     - name: Generate release notes
       shell: bash
