@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-      version: ${{ steps.env.outputs.version }}
-      date: ${{ steps.env.outputs.date }}
+      version: ${{ env.version }}
+      date: ${{ env.date }}
 
     steps:
     - name: Checkout Code
@@ -25,9 +25,9 @@ jobs:
       run: |
         BUILD_DATE=$(date +%Y%m%d)
         VERSION=$(grep ^VERSION= Makefile | awk -F= '{ print $2 }')
-        AMISSLMASTERREVISION=$(grep ^AMISSLMASTERREVISION= Makefile | awk -F= '{ print $2 }')
-        echo "::set-output name=version::${VERSION}.${AMISSLMASTERREVISION}"
-        echo "::set-output name=date::${BUILD_DATE}"
+        REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
+        echo "name=version::${VERSION}.${REVISION}" >> $GITHUB_ENV
+        echo "name=date::${BUILD_DATE}" >> $GITHUB_ENV
 
     - name: Get previous tag
       id: previoustag
@@ -46,7 +46,7 @@ jobs:
         ${{ steps.changelog.outputs.changelog }}
         EOF
         )"
-        export VERSION=${{ steps.env.outputs.version }}
+        export VERSION=${{ env.version }}
         export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
         envsubst <.github/release-template.md >/tmp/release-template.md
 
@@ -54,8 +54,8 @@ jobs:
       id: release_drafter
       uses: ncipollo/release-action@v1.16.0
       with:
-        tag: ${{ steps.env.outputs.version }}
-        name: 'AmiSSL ${{ steps.env.outputs.version }}'
+        tag: ${{ env.version }}
+        name: 'AmiSSL ${{ env.version }}'
         bodyFile: /tmp/release-template.md
         draft: true
         prerelease: false
