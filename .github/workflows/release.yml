@@ -61,7 +61,7 @@ jobs:
       run: |
         sudo rm /usr/local/amiga/bin/ppc-amigaos-strip
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
-        #make -j1 release
+        make -j1 release
 
     ### ADD RELEASE AS WORKFLOW ARTEFACTS
 
