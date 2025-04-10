@@ -19,8 +19,8 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      #with:
+      #  fetch-depth: 0
 
     - name: Setup dependencies
       run: |
@@ -36,9 +36,9 @@ jobs:
         BUILD_DATE=$(date +%Y%m%d)
         VERSION=$(grep ^VERSION= Makefile | awk -F= '{ print $2 }')
         REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
-        OSSLMAJOR=$(grep ^MAJOR= openssl/version.dat | awk -F= '{ print $2 }')
-        OSSLMINOR=$(grep ^MINOR= openssl/version.dat | awk -F= '{ print $2 }')
-        OSSLPATCH=$(grep ^PATCH= openssl/version.dat | awk -F= '{ print $2 }')
+        OSSLMAJOR=$(grep ^MAJOR= openssl/VERSION.dat | awk -F= '{ print $2 }')
+        OSSLMINOR=$(grep ^MINOR= openssl/VERSION.dat | awk -F= '{ print $2 }')
+        OSSLPATCH=$(grep ^PATCH= openssl/VERSION.dat | awk -F= '{ print $2 }')
         echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
         echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
         echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
