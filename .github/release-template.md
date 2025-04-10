@@ -1,7 +1,7 @@
 [![Downloads](https://img.shields.io/github/downloads/jens-maus/amissl/${VERSION}/total.svg)](https://github.com/jens-maus/amissl/releases/${VERSION}) [![License](https://img.shields.io/:license-Apache_2.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0) [![Donate](https://img.shields.io/badge/donate-PayPal-red.svg)](https://www.paypal.com/donate/?hosted_button_id=KSG49RVGY8AG2) [![X Follow](https://img.shields.io/twitter/follow/amigassl?style=social)](https://x.com/amigassl)
 
 ## About
-This is version ${VERSION} of the open-source based AmiSSL library for Amiga based operating systems. AmiSSL v5 is a new major release which has been updated with full compatibility with OpenSSL ${OSSLVER}. This includes important security related fixes, a built-in HTTP(S) client and comes with new encryption ciphers which are required nowadays to connect to modern SSL-based services such as HTTPS and SSH.
+This is version ${VERSION} of the open-source based AmiSSL library for Amiga based operating systems. AmiSSL v5 is a new major release which has been updated with full compatibility with OpenSSL ${OSSLVERSION}. This includes important security related fixes, a built-in HTTP(S) client and comes with new encryption ciphers which are required nowadays to connect to modern SSL-based services such as HTTPS and SSH.
 
 ## Changes
 ${CHANGELOG}
