@@ -39,6 +39,7 @@ jobs:
         OSSLMAJOR=$(grep ^MAJOR= openssl/VERSION.dat | awk -F= '{ print $2 }')
         OSSLMINOR=$(grep ^MINOR= openssl/VERSION.dat | awk -F= '{ print $2 }')
         OSSLPATCH=$(grep ^PATCH= openssl/VERSION.dat | awk -F= '{ print $2 }')
+        echo "osslversion=${OSSLMAJOR}.${OSSLMINOR}" >> $GITHUB_OUTPUT
         echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
         echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
         echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
@@ -97,7 +98,7 @@ jobs:
         )"
         export VERSION=${{ steps.env.outputs.version }}
         export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
-        export OSSLVERSION=${OSSLMAJOR}.${OSSLMINOR}
+        export OSSLVERSION=${{ steps.env.outputs.osslversion }}
         export SHA256SUM="$(cat AmiSSL-${{ steps.env.outputs.version }}-*.lha.sha256)"
         envsubst <.github/release-template.md >/tmp/release-template.md
         
