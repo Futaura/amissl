@@ -5,10 +5,69 @@ on:
   workflow_dispatch:
 
 jobs:
+  release_draft:
+    name: Release draft
+    runs-on: ubuntu-24.04
+    outputs:
+      upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+      version: ${{ steps.env.outputs.version }}
+      date: ${{ steps.env.outputs.date }}
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Environment
+      id: env
+      shell: bash
+      run: |
+        BUILD_DATE=$(date +%Y%m%d)
+        VERSION=$(grep ^VERSION= Makefile | awk -F= '{ print $2 }')
+        REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
+        echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
+        echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
+
+    - name: Get previous tag
+      id: previoustag
+      uses: WyriHaximus/github-action-get-previous-tag@v1.4
+
+    - name: Generate changelog
+      id: changelog
+      uses: metcalfc/changelog-generator@v4.3.1
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+        base-ref: 4.12
+
+    - name: Generate release notes
+      shell: bash
+      run: |
+        export CHANGELOG="$(tac <<'EOF'
+        ${{ steps.changelog.outputs.changelog }}
+        EOF
+        )"
+        export VERSION=${{ steps.env.outputs.version }}
+        export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
+        envsubst <.github/release-template.md >/tmp/release-template.md
+        
+    - name: Create release draft
+      id: release_drafter
+      uses: ncipollo/release-action@v1.16.0
+      with:
+        tag: ${{ steps.env.outputs.version }}
+        name: 'AmiSSL ${{ steps.env.outputs.version }}'
+        bodyFile: /tmp/release-template.md
+        draft: true
+        prerelease: false
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     name: Release build
     runs-on: ubuntu-24.04
     timeout-minutes: 480
+    needs: release_draft
 
     strategy:
       fail-fast: false
@@ -25,6 +84,7 @@ jobs:
 
     - name: setup env
       run : |
+        echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >>$GITHUB_ENV
         echo "BUILD_DATE=$(date +'%Y%m%d')" >>$GITHUB_ENV
 
     - name: install adtools build env
@@ -51,86 +111,23 @@ jobs:
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
         make -j1 release
 
-  release_draft:
-    name: Release draft
-    runs-on: ubuntu-24.04
-    needs: build
-
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup Environment
-      id: env
-      shell: bash
-      run: |
-        BUILD_DATE=$(date +%Y%m%d)
-        VERSION=$(grep ^VERSION= Makefile | awk -F= '{ print $2 }')
-        REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
-        echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
-        echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
-        echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >>$GITHUB_ENV
-
-    - name: Get previous tag
-      id: previoustag
-      uses: WyriHaximus/github-action-get-previous-tag@v1.4
-
-    - name: Generate changelog
-      id: changelog
-      uses: metcalfc/changelog-generator@v4.3.1
-      with:
-        myToken: ${{ secrets.GITHUB_TOKEN }}
-        base-ref: 4.12
-
-    - name: Generate release notes
-      shell: bash
-      run: |
-        export CHANGELOG="$(tac <<'EOF'
-        ${{ steps.changelog.outputs.changelog }}
-        EOF
-        )"
-        export VERSION=${{ steps.env.outputs.version }}
-        export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
-        export SHA256SUM="$(cat <<'EOF'
-        AmiSSL-${{ steps.env.outputs.version }}-OS3.lha.sha256
-        AmiSSL-${{ steps.env.outputs.version }}-OS4.lha.sha256
-        AmiSSL-${{ steps.env.outputs.version }}-SDK.lha.sha256
-        EOF
-        )"
-        envsubst <.github/release-template.md >/tmp/release-template.md
-
-    - name: Create release draft
-      id: release_drafter
-      uses: ncipollo/release-action@v1.16.0
-      with:
-        tag: ${{ steps.env.outputs.version }}
-        name: 'AmiSSL ${{ steps.env.outputs.version }}'
-        bodyFile: /tmp/release-template.md
-        draft: true
-        prerelease: false
-        allowUpdates: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: upload release archive as workflow artifact
+    - name: upload release archives as workflow artifacts
       uses: actions/upload-artifact@v4
       with:
-        path: |
-          AmiSSL-${{ steps.env.outputs.version }}-OS3.lha
-          AmiSSL-${{ steps.env.outputs.version }}-OS4.lha
-          AmiSSL-${{ steps.env.outputs.version }}-SDK.lha
-        name: AmiSSL-${{ steps.env.outputs.version }}-${{ env.GITHUB_SHA7 }}
+        path: AmiSSL-${{ needs.release_draft.outputs.version }}-*.lha
+        name: AmiSSL-${{ needs.release_draft.outputs.version }}-${{ env.GITHUB_SHA7 }}
       continue-on-error: true
 
+    #######################
+    # release uploads
     - name: Upload release archive [os3]
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-        asset_path: AmiSSL-${{ steps.env.outputs.version }}-OS3.lha
-        asset_name: AmiSSL-${{ steps.env.outputs.version }}-OS3.lha
+        upload_url: ${{ needs.release_draft.outputs.upload_url }}
+        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-OS3.lha
+        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-OS3.lha
         asset_content_type: application/x-lha
 
     - name: Upload release archive [os4]
@@ -138,9 +135,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-        asset_path: AmiSSL-${{ steps.env.outputs.version }}-OS4.lha
-        asset_name: AmiSSL-${{ steps.env.outputs.version }}-OS4.lha
+        upload_url: ${{ needs.release_draft.outputs.upload_url }}
+        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-OS4.lha
+        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-OS4.lha
         asset_content_type: application/x-lha
 
     - name: Upload release archive [sdk]
@@ -148,7 +145,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-        asset_path: AmiSSL-${{ steps.env.outputs.version }}-SDK.lha
-        asset_name: AmiSSL-${{ steps.env.outputs.version }}-SDK.lha
+        upload_url: ${{ needs.release_draft.outputs.upload_url }}
+        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-SDK.lha
+        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-SDK.lha
         asset_content_type: application/x-lha
