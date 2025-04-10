@@ -5,19 +5,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  release_draft:
-    name: Release draft
+  build:
+    name: Make Draft Release
     runs-on: ubuntu-24.04
-    outputs:
-      upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-      version: ${{ steps.env.outputs.version }}
-      date: ${{ steps.env.outputs.date }}
+    timeout-minutes: 480
+
+    strategy:
+      fail-fast: false
 
     steps:
-    - name: Checkout Code
+
+    # SETUP #
+
+    - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+#      with:
+#        fetch-depth: 0
+
+    - name: Setup dependencies
+      run: |
+        sudo dpkg --add-architecture i386
+        sudo apt-get update -y -qq || true
+        sudo apt-get -qq install libc6:i386
+        sudo ln -s /usr/lib/x86_64-linux-gnu/libmpfr.so.6 /usr/lib/x86_64-linux-gnu/libmpfr.so.4
 
     - name: Setup Environment
       id: env
@@ -28,6 +38,41 @@ jobs:
         REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
         echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
         echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
+        echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+        echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >>$GITHUB_ENV
+
+    - name: Install adtools build env
+      run: |
+        DOWNLOAD_PATH=https://github.com/adtools/adtools/releases/download/20170213
+        DOWNLOAD_PATH_UTILS=https://github.com/adtools/adtools/releases/download/20220416
+        curl -L ${DOWNLOAD_PATH_UTILS}/adtools-utils.tar.bz2 | sudo tar xj -C /
+        curl -L ${DOWNLOAD_PATH}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
+        curl -L ${DOWNLOAD_PATH}/adtools-ppc-amigaos-legacy.tar.bz2 | sudo tar xj -C /
+        curl -L ${DOWNLOAD_PATH}/adtools-ppc-amigaos.tar.bz2 | sudo tar xj -C /
+        #curl -L ${DOWNLOAD_PATH}/adtools-ppc-morphos.tar.bz2 | sudo tar xj -C /
+        #curl -L ${DOWNLOAD_PATH}/adtools-ppc-aros.tar.bz2 | sudo tar xj -C /
+        #curl -L ${DOWNLOAD_PATH}/adtools-i386-aros.tar.bz2 | sudo tar xj -C /
+        #curl -L ${DOWNLOAD_PATH}/adtools-x86_64-aros.tar.bz2 | sudo tar xj -C /
+
+    # MAKE BUILD #
+    
+    - name: Build AmiSSL release
+      timeout-minutes: 480
+      run: |
+        sudo rm /usr/local/amiga/bin/ppc-amigaos-strip
+        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
+        #make -j1 release
+
+    # ADD RELEASE AS WORKFLOW ARTEFACTS #
+
+    - name: upload release files as workflow artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        path: AmiSSL-${{ version }}-*
+        name: AmiSSL-${{ version }}-${{ env.GITHUB_SHA7 }}
+      continue-on-error: true
+
+    # CREATE DRAFT RELEASE #
 
     - name: Get previous tag
       id: previoustag
@@ -61,91 +106,6 @@ jobs:
         draft: true
         prerelease: false
         allowUpdates: true
+        artefacts: AmiSSL-${{ needs.release_draft.outputs.version }}-*.lha
+        artefactContentType: application/x-lha
         token: ${{ secrets.GITHUB_TOKEN }}
-
-  build:
-    name: Release build
-    runs-on: ubuntu-24.04
-    timeout-minutes: 480
-    needs: release_draft
-
-    strategy:
-      fail-fast: false
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: setup dependencies
-      run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update -y -qq || true
-        sudo apt-get -qq install libc6:i386
-        sudo ln -s /usr/lib/x86_64-linux-gnu/libmpfr.so.6 /usr/lib/x86_64-linux-gnu/libmpfr.so.4
-
-    - name: setup env
-      run : |
-        echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >>$GITHUB_ENV
-        echo "BUILD_DATE=$(date +'%Y%m%d')" >>$GITHUB_ENV
-
-    - name: install adtools build env
-      run: |
-        DOWNLOAD_PATH=https://github.com/adtools/adtools/releases/download/20170213
-        DOWNLOAD_PATH_UTILS=https://github.com/adtools/adtools/releases/download/20220416
-        curl -L ${DOWNLOAD_PATH_UTILS}/adtools-utils.tar.bz2 | sudo tar xj -C /
-        curl -L ${DOWNLOAD_PATH}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
-        curl -L ${DOWNLOAD_PATH}/adtools-ppc-amigaos-legacy.tar.bz2 | sudo tar xj -C /
-        curl -L ${DOWNLOAD_PATH}/adtools-ppc-amigaos.tar.bz2 | sudo tar xj -C /
-        #curl -L ${DOWNLOAD_PATH}/adtools-ppc-morphos.tar.bz2 | sudo tar xj -C /
-        #curl -L ${DOWNLOAD_PATH}/adtools-ppc-aros.tar.bz2 | sudo tar xj -C /
-        #curl -L ${DOWNLOAD_PATH}/adtools-i386-aros.tar.bz2 | sudo tar xj -C /
-        #curl -L ${DOWNLOAD_PATH}/adtools-x86_64-aros.tar.bz2 | sudo tar xj -C /
-
-    #- name: remote debug tmate session
-    #  uses: mxschmitt/action-tmate@v1
-
-    # major build step
-    - name: build AmiSSL release
-      timeout-minutes: 480
-      run: |
-        sudo rm /usr/local/amiga/bin/ppc-amigaos-strip
-        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
-        make -j1 release
-
-    - name: upload release archives as workflow artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        path: AmiSSL-${{ needs.release_draft.outputs.version }}-*.lha
-        name: AmiSSL-${{ needs.release_draft.outputs.version }}-${{ env.GITHUB_SHA7 }}
-      continue-on-error: true
-
-    #######################
-    # release uploads
-    - name: Upload release archive [os3]
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.release_draft.outputs.upload_url }}
-        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-OS3.lha
-        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-OS3.lha
-        asset_content_type: application/x-lha
-
-    - name: Upload release archive [os4]
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.release_draft.outputs.upload_url }}
-        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-OS4.lha
-        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-OS4.lha
-        asset_content_type: application/x-lha
-
-    - name: Upload release archive [sdk]
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.release_draft.outputs.upload_url }}
-        asset_path: AmiSSL-${{ needs.release_draft.outputs.version }}-SDK.lha
-        asset_name: AmiSSL-${{ needs.release_draft.outputs.version }}-SDK.lha
-        asset_content_type: application/x-lha
