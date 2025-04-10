@@ -38,7 +38,7 @@ jobs:
       uses: metcalfc/changelog-generator@v4.3.1
       with:
         myToken: ${{ secrets.GITHUB_TOKEN }}
-        base-ref: 4.12
+#        base-ref: 4.12
 
     - name: Generate release notes
       shell: bash
