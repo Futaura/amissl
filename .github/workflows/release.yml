@@ -36,6 +36,9 @@ jobs:
         BUILD_DATE=$(date +%Y%m%d)
         VERSION=$(grep ^VERSION= Makefile | awk -F= '{ print $2 }')
         REVISION=$(grep ^REVISION= Makefile | awk -F= '{ print $2 }')
+        OSSLMAJOR=$(grep ^MAJOR= openssl/version.dat | awk -F= '{ print $2 }')
+        OSSLMINOR=$(grep ^MINOR= openssl/version.dat | awk -F= '{ print $2 }')
+        OSSLPATCH=$(grep ^PATCH= openssl/version.dat | awk -F= '{ print $2 }')
         echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
         echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
         echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
@@ -65,7 +68,7 @@ jobs:
 
     ### ADD RELEASE AS WORKFLOW ARTEFACTS
 
-    - name: Upload release files as workflow artifacts
+    - name: Upload all release files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
         path: AmiSSL-${{ steps.env.outputs.version }}-*
@@ -94,6 +97,7 @@ jobs:
         )"
         export VERSION=${{ steps.env.outputs.version }}
         export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
+        export OSSLVERSION=${OSSLMAJOR}.${OSSLMINOR}
         export SHA256SUM="$(cat AmiSSL-${{ steps.env.outputs.version }}-*.lha.sha256)"
         envsubst <.github/release-template.md >/tmp/release-template.md
         
