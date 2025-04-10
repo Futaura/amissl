@@ -19,8 +19,8 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v4
-#      with:
-#        fetch-depth: 0
+      with:
+        fetch-depth: 0
 
     - name: Setup dependencies
       run: |
@@ -68,8 +68,8 @@ jobs:
     - name: upload release files as workflow artifacts
       uses: actions/upload-artifact@v4
       with:
-        path: AmiSSL-${{ env.version }}-*
-        name: AmiSSL-${{ env.version }}-${{ env.GITHUB_SHA7 }}
+        path: AmiSSL-${{ steps.env.outputs.version }}-*
+        name: AmiSSL-${{ steps.env.outputs.version }}-${{ env.GITHUB_SHA7 }}
       continue-on-error: true
 
     # CREATE DRAFT RELEASE #
@@ -97,7 +97,6 @@ jobs:
         envsubst <.github/release-template.md >/tmp/release-template.md
         
     - name: Create release draft
-      id: release_drafter
       uses: ncipollo/release-action@v1.16.0
       with:
         tag: ${{ steps.env.outputs.version }}
@@ -106,6 +105,6 @@ jobs:
         draft: true
         prerelease: false
         allowUpdates: true
-        artefacts: AmiSSL-${{ needs.release_draft.outputs.version }}-*.lha
-        artefactContentType: application/x-lha
+        artifacts: AmiSSL-${{ steps.env.outputs.version }}-*.lha
+        artifactContentType: application/x-lha
         token: ${{ secrets.GITHUB_TOKEN }}
