@@ -61,7 +61,7 @@ jobs:
     - name: Install adtools build env
       run: |
         curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
-        curl -L ${{ env.ADTOOLS_DL_PATH }/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
 
     - name: Compile release
       timeout-minutes: 480
