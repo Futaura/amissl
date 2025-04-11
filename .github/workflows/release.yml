@@ -66,7 +66,7 @@ jobs:
     - name: Compile release
       timeout-minutes: 480
       run: |
-        export PATH=/opt/m68k-amigaos/bin:${PATH}
+        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:${PATH}
         make -j1 OS=os3-68020 DEBUG=
 
     - name: Upload build files as a workflow artifact
@@ -103,7 +103,7 @@ jobs:
     - name: Compile release
       timeout-minutes: 480
       run: |
-        export PATH=/opt/m68k-amigaos/bin:${PATH}
+        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:${PATH}
         make -j1 OS=os3-68060 DEBUG=
 
     - name: Upload build files as a workflow artifact
