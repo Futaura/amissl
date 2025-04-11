@@ -7,6 +7,7 @@ on:
 env:
   ADTOOLS_DL_PATH: https://github.com/adtools/adtools/releases/download/20170213
   ADTOOLS_UTILS_DL: https://github.com/adtools/adtools/releases/download/20220416/adtools-utils.tar.bz2
+  GITHUB_SHA7: ${GITHUB_SHA::7}
 
 jobs:
 
@@ -73,7 +74,7 @@ jobs:
     - name: Upload build files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
-        path: build_os3-68020/
+        path: build_os3-68020*
         name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-020.tgz
 
   ## Build OS3 68060
@@ -111,7 +112,7 @@ jobs:
     - name: Upload build files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
-        path: build_os3-68060/
+        path: build_os3-68060*
         name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-060.tgz
 
   ## Build OS4
@@ -149,7 +150,7 @@ jobs:
     - name: Upload build files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
-        path: build_os4/
+        path: build_os4*
         name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os4.tgz
 
   ## Create draft release
