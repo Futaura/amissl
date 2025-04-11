@@ -7,7 +7,6 @@ on:
 env:
   ADTOOLS_DL_PATH: https://github.com/adtools/adtools/releases/download/20170213
   ADTOOLS_UTILS_DL: https://github.com/adtools/adtools/releases/download/20220416/adtools-utils.tar.bz2
-  GITHUB_SHA7: ${GITHUB_SHA::7}
 
 jobs:
 
@@ -16,15 +15,17 @@ jobs:
     name: Setup Environment
     runs-on: ubuntu-latest
     outputs:
-      osslversion: ${{ steps.env.outputs.osslversion }}
-      version: ${{ steps.env.outputs.version }}
-      date: ${{ steps.env.outputs.date }}
+      osslversion: ${{ steps.setup.outputs.osslversion }}
+      version: ${{ steps.setup.outputs.version }}
+      date: ${{ steps.setup.outputs.date }}
+      GITHUB_SHA7: ${{ steps.setup.outputs.GITHUB_SHA7 }}
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Get versions
+      id: setup
       shell: bash
       run: |
         BUILD_DATE=$(date +%Y%m%d)
@@ -36,8 +37,7 @@ jobs:
         echo "osslversion=${OSSLMAJOR}.${OSSLMINOR}" >> $GITHUB_OUTPUT
         echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
         echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
-        echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-        echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >> $GITHUB_ENV
+        echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT
 
   ## Build OS3 68020-40
   build_os3_020:
@@ -75,7 +75,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os3-68020*
-        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-020.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os3-020.tgz
 
   ## Build OS3 68060
   build_os3_060:
@@ -113,7 +113,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os3-68060*
-        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-060.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os3-060.tgz
 
   ## Build OS4
   build_os4:
@@ -151,7 +151,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os4*
-        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os4.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os4.tgz
 
   ## Create draft release
   release_draft:
