@@ -85,6 +85,7 @@ jobs:
       uses: WyriHaximus/github-action-get-previous-tag@v1.4
 
     - name: Generate changelog
+      if: false
       id: changelog
       uses: metcalfc/changelog-generator@v4.3.1
       with:
@@ -129,6 +130,12 @@ jobs:
         artifacts: AmiSSL-${{ needs.setup.outputs.version }}-*.lha
         artifactContentType: application/x-lha
         token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload release files as a workflow artifact
+      uses: actions/upload-artifact@v4
+      with:
+        path: AmiSSL-${{ needs.setup.outputs.version }}-*
+        name: release-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}
 
   ## Build OS3 68020-40
   build_os3_020:
