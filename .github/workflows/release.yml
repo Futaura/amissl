@@ -4,14 +4,16 @@ name: Release Build
 on:
   workflow_dispatch:
 
+env:
+  ADTOOLS_DL_PATH: "https://github.com/adtools/adtools/releases/download/20170213"
+  ADTOOLS_UTILS_DL: "https://github.com/adtools/adtools/releases/download/20220416/adtools-utils.tar.bz2"
+
 jobs:
   ## Setup
   setup:
     name: Setup Environment
     runs-on: ubuntu-latest
     outputs:
-      adtools_dl_path: https://github.com/adtools/adtools/releases/download/20170213
-      adtools_utils_dl: https://github.com/adtools/adtools/releases/download/20220416/adtools-utils.tar.bz2
       osslversion: ${{ steps.env.outputs.osslversion }}
       version: ${{ steps.env.outputs.version }}
       date: ${{ steps.env.outputs.date }}
@@ -58,10 +60,8 @@ jobs:
 
     - name: Install adtools build env
       run: |
-        DOWNLOAD_PATH=https://github.com/adtools/adtools/releases/download/20170213
-        DOWNLOAD_PATH_UTILS=https://github.com/adtools/adtools/releases/download/20220416
-        curl -L ${{ needs.setup.adtools_utils_dl}} | sudo tar xj -C /
-        curl -L ${{ needs.setup.adtools_dl_path}}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
 
     - name: Compile release
       timeout-minutes: 480
@@ -97,8 +97,8 @@ jobs:
 
     - name: Install adtools build env
       run: |
-        curl -L ${{ needs.setup.adtools_utils_dl}} | sudo tar xj -C /
-        curl -L ${{ needs.setup.adtools_dl_path}}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
 
     - name: Compile release
       timeout-minutes: 480
@@ -134,8 +134,8 @@ jobs:
 
     - name: Install adtools build env
       run: |
-        curl -L ${{ needs.setup.adtools_utils_dl}}| sudo tar xj -C /
-        curl -L ${{ needs.setup.adtools_dl_path}}/adtools-ppc-amigaos-legacy.tar.bz2 | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-amigaos-legacy.tar.bz2 | sudo tar xj -C /
 
     - name: Compile release
       timeout-minutes: 480
