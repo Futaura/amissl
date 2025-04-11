@@ -74,7 +74,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os3-68020
-        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-020.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.env.GITHUB_SHA7 }}-os3-020.tgz
 
   ## Build OS3 68060
   build_os3_060:
@@ -112,7 +112,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os3-68060
-        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-060.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.env.GITHUB_SHA7 }}-os3-060.tgz
 
   ## Build OS4
   build_os4:
@@ -150,7 +150,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os4
-        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os4.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.env.GITHUB_SHA7 }}-os4.tgz
 
   ## Create draft release
   release_draft:
@@ -178,12 +178,12 @@ jobs:
 
     - name: Install adtools build env
       run: |
-        curl -L ${{ env.adtools_dl_path }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
-        curl -L ${{ env.adtools_dl_path }}/adtools-ppc-amigaos.tar.bz2 | sudo tar xj -C /
-        #curl -L ${{ env.adtools_dl_path }}/adtools-ppc-morphos.tar.bz2 | sudo tar xj -C /
-        #curl -L ${{ env.adtools_dl_path }}/adtools-ppc-aros.tar.bz2 | sudo tar xj -C /
-        #curl -L ${{ env.adtools_dl_path }}/adtools-i386-aros.tar.bz2 | sudo tar xj -C /
-        #curl -L ${{ env.adtools_dl_path }}/adtools-x86_64-aros.tar.bz2 | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-amigaos.tar.bz2 | sudo tar xj -C /
+        #curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-morphos.tar.bz2 | sudo tar xj -C /
+        #curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-aros.tar.bz2 | sudo tar xj -C /
+        #curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-i386-aros.tar.bz2 | sudo tar xj -C /
+        #curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-x86_64-aros.tar.bz2 | sudo tar xj -C /
 
     - name: Build AmiSSL release archives
       run: |
