@@ -39,9 +39,10 @@ jobs:
   build_os3_020:
     name: Build OS3 68020-40
     runs-on: ubuntu-latest
-    timeout-minutes: 480
-    strategy: fail-fast: false
     needs: setup
+    timeout-minutes: 480
+    strategy:
+      fail-fast: false
 
     steps:
     - name: Checkout code
@@ -76,9 +77,10 @@ jobs:
   build_os3_060:
     name: Build OS3 68060
     runs-on: ubuntu-latest
-    timeout-minutes: 480
-    strategy: fail-fast: false
     needs: setup
+    timeout-minutes: 480
+    strategy:
+      fail-fast: false
 
     steps:
     - name: Checkout code
@@ -113,9 +115,10 @@ jobs:
   build_os4:
     name: Build OS4
     runs-on: ubuntu-latest
-    timeout-minutes: 480
-    strategy: fail-fast: false
     needs: setup
+    timeout-minutes: 480
+    strategy:
+      fail-fast: false
 
     steps:
     - name: Checkout code
