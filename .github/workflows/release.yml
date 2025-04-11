@@ -96,12 +96,26 @@ jobs:
         ${{ steps.changelog.outputs.changelog }}
         EOF
         )"
+        export CHANGELOG="$(awk '
+          BEGIN { lines=0 }
+          {
+            if (/^\s*-|\+/) {
+              if (lines++ > 0) printf "\n";
+              printf $0
+            } else if (lines > 0) {
+              if (/^$/) exit
+              $1=$1
+              printf " %s", $0
+            }
+          }
+          END { printf "\n" }
+        ' < CHANGES.md )";
         export VERSION=${{ steps.env.outputs.version }}
         export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
         export OSSLVERSION=${{ steps.env.outputs.osslversion }}
         export SHA256SUM="$(cat AmiSSL-${{ steps.env.outputs.version }}-*.lha.sha256)"
         envsubst <.github/release-template.md >/tmp/release-template.md
-        
+
     - name: Create release draft
       uses: ncipollo/release-action@v1.16.0
       with:
