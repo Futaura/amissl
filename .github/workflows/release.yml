@@ -73,7 +73,7 @@ jobs:
     - name: Upload build files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
-        path: build_os3-68020
+        path: build_os3-68020/
         name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-020.tgz
 
   ## Build OS3 68060
@@ -111,8 +111,8 @@ jobs:
     - name: Upload build files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
-        path: build_os3-68060
-        name: build-${{ needs.setup.outputs.version }}-$GITHUB_SHA7-os3-060.tgz
+        path: build_os3-68060/
+        name: build-${{ needs.setup.outputs.version }}-${{ env.$GITHUB_SHA7 }}-os3-060.tgz
 
   ## Build OS4
   build_os4:
@@ -149,7 +149,7 @@ jobs:
     - name: Upload build files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
-        path: build_os4
+        path: build_os4/
         name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os4.tgz
 
   ## Create draft release
