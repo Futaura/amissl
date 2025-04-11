@@ -187,6 +187,7 @@ jobs:
 
     - name: Build AmiSSL release archives
       run: |
+        ls -las
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
         ./tools/mkrelease.sh
 
