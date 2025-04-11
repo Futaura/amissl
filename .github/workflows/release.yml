@@ -69,7 +69,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os3-68020
-        name: build-${{ setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-020.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-020.tgz
 
   ## Build OS3 68060
   build_os3_060:
@@ -106,7 +106,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os3-68060
-        name: build-${{ setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-060.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-060.tgz
 
   ## Build OS4
   build_os4:
@@ -146,7 +146,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os4
-        name: build-${{ setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os4.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os4.tgz
 
   ## Create draft release
   release_draft:
@@ -206,21 +206,21 @@ jobs:
           }
           END { printf "\n" }
         ' < CHANGES.md )";
-        export VERSION=${{ setup.outputs.version }}
+        export VERSION=${{ needs.setup.outputs.version }}
         export PREVIOUS_TAG=${{ steps.previoustag.outputs.tag }}
-        export OSSLVERSION=${{ setup.outputs.osslversion }}
-        export SHA256SUM="$(cat AmiSSL-${{ setup.outputs.version }}-*.lha.sha256)"
+        export OSSLVERSION=${{ needs.setup.outputs.osslversion }}
+        export SHA256SUM="$(cat AmiSSL-${{ needs.setup.outputs.version }}-*.lha.sha256)"
         envsubst <.github/release-template.md >/tmp/release-template.md
 
     - name: Create release draft
       uses: ncipollo/release-action@v1.16.0
       with:
-        tag: ${{ setup.outputs.version }}
-        name: 'AmiSSL ${{ setup.outputs.version }}'
+        tag: ${{ needs.setup.outputs.version }}
+        name: 'AmiSSL ${{ needs.setup.outputs.version }}'
         bodyFile: /tmp/release-template.md
         draft: true
         prerelease: false
         allowUpdates: true
-        artifacts: AmiSSL-${{ setup.outputs.version }}-*.lha
+        artifacts: AmiSSL-${{ needs.setup.outputs.version }}-*.lha
         artifactContentType: application/x-lha
         token: ${{ secrets.GITHUB_TOKEN }}
