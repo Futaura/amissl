@@ -112,7 +112,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         path: build_os3-68060/
-        name: build-${{ needs.setup.outputs.version }}-${{ env.$GITHUB_SHA7 }}-os3-060.tgz
+        name: build-${{ needs.setup.outputs.version }}-${{ env.GITHUB_SHA7 }}-os3-060.tgz
 
   ## Build OS4
   build_os4:
