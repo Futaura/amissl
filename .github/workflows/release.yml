@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
 env:
-  ADTOOLS_DL_PATH: "https://github.com/adtools/adtools/releases/download/20170213"
-  ADTOOLS_UTILS_DL: "https://github.com/adtools/adtools/releases/download/20220416/adtools-utils.tar.bz2"
+  ADTOOLS_DL_PATH: https://github.com/adtools/adtools/releases/download/20170213"
+  ADTOOLS_UTILS_DL: https://github.com/adtools/adtools/releases/download/20220416/adtools-utils.tar.bz2
 
 jobs:
   ## Setup
@@ -36,7 +36,7 @@ jobs:
         echo "version=${VERSION}.${REVISION}" >> $GITHUB_OUTPUT
         echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
         echo "BUILD_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-        echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >>$GITHUB_ENV
+        echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >> $GITHUB_ENV
 
   ## Build OS3 68020-40
   build_os3_020:
@@ -52,6 +52,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup dependencies
+      if: false
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update -y -qq || true
@@ -89,6 +90,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup dependencies
+      if: false
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update -y -qq || true
@@ -126,6 +128,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup dependencies
+      if: false
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update -y -qq || true
@@ -140,7 +143,6 @@ jobs:
     - name: Compile release
       timeout-minutes: 480
       run: |
-        sudo rm /usr/local/amiga/bin/ppc-amigaos-strip
         export PATH=/usr/local/amiga/bin:${PATH}
         make -j1 OS=os4 DEBUG= all build_docs
 
@@ -167,14 +169,25 @@ jobs:
       uses: actions/download-artifact@v4
 
     - name: Setup dependencies
+      if: false
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update -y -qq || true
         sudo apt-get -qq install libc6:i386
         sudo ln -s /usr/lib/x86_64-linux-gnu/libmpfr.so.6 /usr/lib/x86_64-linux-gnu/libmpfr.so.4
 
+    - name: Install adtools build env
+      run: |
+        curl -L ${{ env.adtools_dl_path }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
+        curl -L ${{ env.adtools_dl_path }}/adtools-ppc-amigaos.tar.bz2 | sudo tar xj -C /
+        #curl -L ${{ env.adtools_dl_path }}/adtools-ppc-morphos.tar.bz2 | sudo tar xj -C /
+        #curl -L ${{ env.adtools_dl_path }}/adtools-ppc-aros.tar.bz2 | sudo tar xj -C /
+        #curl -L ${{ env.adtools_dl_path }}/adtools-i386-aros.tar.bz2 | sudo tar xj -C /
+        #curl -L ${{ env.adtools_dl_path }}/adtools-x86_64-aros.tar.bz2 | sudo tar xj -C /
+
     - name: Build AmiSSL release archives
       run: |
+        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
         ./tools/mkrelease.sh
 
     - name: Get previous tag
