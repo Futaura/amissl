@@ -39,120 +39,6 @@ jobs:
         echo "date=${BUILD_DATE}" >> $GITHUB_OUTPUT
         echo "GITHUB_SHA7=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT
 
-  ## Build OS3 68020-40
-  build_os3_020:
-    name: Build OS3 68020
-    runs-on: ubuntu-latest
-    needs: setup
-    timeout-minutes: 480
-    strategy:
-      fail-fast: false
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup dependencies
-      if: false
-      run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update -y -qq || true
-        sudo apt-get -qq install libc6:i386
-        sudo ln -s /usr/lib/x86_64-linux-gnu/libmpfr.so.6 /usr/lib/x86_64-linux-gnu/libmpfr.so.4
-
-    - name: Install adtools build env
-      run: |
-        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
-        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
-
-    - name: Compile release
-      timeout-minutes: 480
-      run: |
-        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:${PATH}
-        make -j1 OS=os3-68020 DEBUG=
-
-    - name: Upload build files as a workflow artifact
-      uses: actions/upload-artifact@v4
-      with:
-        path: build_os3-68020*
-        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os3-020.tgz
-
-  ## Build OS3 68060
-  build_os3_060:
-    name: Build OS3 68060
-    runs-on: ubuntu-latest
-    needs: setup
-    timeout-minutes: 480
-    strategy:
-      fail-fast: false
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup dependencies
-      if: false
-      run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update -y -qq || true
-        sudo apt-get -qq install libc6:i386
-        sudo ln -s /usr/lib/x86_64-linux-gnu/libmpfr.so.6 /usr/lib/x86_64-linux-gnu/libmpfr.so.4
-
-    - name: Install adtools build env
-      run: |
-        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
-        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
-
-    - name: Compile release
-      timeout-minutes: 480
-      run: |
-        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:${PATH}
-        make -j1 OS=os3-68060 DEBUG=
-
-    - name: Upload build files as a workflow artifact
-      uses: actions/upload-artifact@v4
-      with:
-        path: build_os3-68060*
-        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os3-060.tgz
-
-  ## Build OS4
-  build_os4:
-    name: Build OS4 + Docs
-    runs-on: ubuntu-latest
-    needs: setup
-    timeout-minutes: 480
-    strategy:
-      fail-fast: false
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup dependencies
-      if: false
-      run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update -y -qq || true
-        sudo apt-get -qq install libc6:i386
-        sudo ln -s /usr/lib/x86_64-linux-gnu/libmpfr.so.6 /usr/lib/x86_64-linux-gnu/libmpfr.so.4
-
-    - name: Install adtools build env
-      run: |
-        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
-        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-amigaos-legacy.tar.bz2 | sudo tar xj -C /
-
-    - name: Compile release
-      timeout-minutes: 480
-      run: |
-        export PATH=/usr/local/amiga/bin:${PATH}
-        make -j1 OS=os4 DEBUG= all build_docs
-
-    - name: Upload build files as a workflow artifact
-      uses: actions/upload-artifact@v4
-      with:
-        path: build_os4*
-        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os4.tgz
-
   ## Create draft release
   release_draft:
     name: Create Draft Release
@@ -172,7 +58,7 @@ jobs:
         merge-multiple: true
 
     - name: Setup dependencies
-#      if: false
+      if: false
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update -y -qq || true
@@ -181,6 +67,7 @@ jobs:
 
     - name: Install adtools build env
       run: |
+        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
         curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
         curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-amigaos.tar.bz2 | sudo tar xj -C /
         #curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-morphos.tar.bz2 | sudo tar xj -C /
@@ -190,7 +77,6 @@ jobs:
 
     - name: Build AmiSSL release archives
       run: |
-        ls -las
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
         ./tools/mkrelease.sh
 
@@ -243,3 +129,93 @@ jobs:
         artifacts: AmiSSL-${{ needs.setup.outputs.version }}-*.lha
         artifactContentType: application/x-lha
         token: ${{ secrets.GITHUB_TOKEN }}
+
+  ## Build OS3 68020-40
+  build_os3_020:
+    name: Build OS3 68020
+    runs-on: ubuntu-latest
+    needs: setup
+    timeout-minutes: 480
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install adtools build env
+      run: |
+        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
+
+    - name: Compile release
+      timeout-minutes: 480
+      run: |
+        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:${PATH}
+        make -j1 OS=os3-68020 DEBUG=
+
+    - name: Upload build files as a workflow artifact
+      uses: actions/upload-artifact@v4
+      with:
+        path: build_os3-68020*
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os3-020
+
+  ## Build OS3 68060
+  build_os3_060:
+    name: Build OS3 68060
+    runs-on: ubuntu-latest
+    needs: setup
+    timeout-minutes: 480
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install adtools build env
+      run: |
+        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
+
+    - name: Compile release
+      timeout-minutes: 480
+      run: |
+        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:${PATH}
+        make -j1 OS=os3-68060 DEBUG=
+
+    - name: Upload build files as a workflow artifact
+      uses: actions/upload-artifact@v4
+      with:
+        path: build_os3-68060*
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os3-060
+
+  ## Build OS4
+  build_os4:
+    name: Build OS4 + Docs
+    runs-on: ubuntu-latest
+    needs: setup
+    timeout-minutes: 480
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install adtools build env
+      run: |
+        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-amigaos-legacy.tar.bz2 | sudo tar xj -C /
+
+    - name: Compile release
+      timeout-minutes: 480
+      run: |
+        export PATH=/usr/local/amiga/bin:${PATH}
+        make -j1 OS=os4 DEBUG= all build_docs
+
+    - name: Upload build files as a workflow artifact
+      uses: actions/upload-artifact@v4
+      with:
+        path: build_os4*
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os4
