@@ -165,11 +165,13 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Download all artifacts
+    - name: Download all builds
       uses: actions/download-artifact@v4
+      with:
+        merge-multiple: false
 
     - name: Setup dependencies
-      if: false
+#      if: false
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update -y -qq || true
