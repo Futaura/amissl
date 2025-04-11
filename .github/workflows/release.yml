@@ -142,7 +142,7 @@ jobs:
       run: |
         sudo rm /usr/local/amiga/bin/ppc-amigaos-strip
         export PATH=/usr/local/amiga/bin:${PATH}
-        make -j1 OS=os4 DEBUG=
+        make -j1 OS=os4 DEBUG= all build_docs
 
     - name: Upload build files as a workflow artifact
       uses: actions/upload-artifact@v4
