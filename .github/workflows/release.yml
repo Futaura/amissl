@@ -78,7 +78,7 @@ jobs:
 
     - name: Build AmiSSL release archives
       run: |
-        sudo apt-get --q install git-restore-mtime
+        sudo apt-get -qq install git-restore-mtime
         git restore-mtime --merge
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
         (cd build_os4/openssl; ../../openssl/Configure amiga-os4; make -j1 build_generated_pods)
