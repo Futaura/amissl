@@ -71,6 +71,9 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Run git-restore-mtime
+      uses: chetan/git-restore-mtime-action@v2.1
+  
     - name: Download all builds
       uses: actions/download-artifact@v4
       with:
@@ -78,7 +81,6 @@ jobs:
 
     - name: Build AmiSSL release archives
       run: |
-        git restore-mtime
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
         (cd build_os4/openssl; ../../openssl/Configure amiga-os4; make -j1 build_generated_pods)
         ./tools/mkrelease.sh
