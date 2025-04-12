@@ -173,13 +173,13 @@ jobs:
         if [[ ${{ matrix.platform }} =~ aros-x86_64 ]]; then COMPILER=adtools-x86_64-aros.tar.bz2 / ; fi
         curl -L ${{ env.ADTOOLS_DL_PATH }}/${COMPILER} | sudo tar xj -C /
           
-    - name: Compile ${{ matrix.platform } release
+    - name: Compile ${{ matrix.platform }} release
       timeout-minutes: 480
       run: |
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
         make -j1 OS=${{ matrix.platform }} DEBUG=
 
-    - name: Upload ${{ matrix.platform } build files as a workflow artifact
+    - name: Upload ${{ matrix.platform }} build files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
         path: build_${{ matrix.platform }}*
