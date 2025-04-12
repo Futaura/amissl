@@ -46,7 +46,7 @@ jobs:
     name: Create Draft Release
     runs-on: ubuntu-latest
     timeout-minutes: 480
-    needs: [ setup, build_os3_020, build_os3_060, build_os4 ]
+    needs: [ setup, build ]
     
     steps:
     - name: Setup dependencies
