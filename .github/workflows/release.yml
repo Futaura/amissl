@@ -163,12 +163,12 @@ jobs:
     - name: Install adtools build env
       run: |
         curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
-        if [[ ${{ matrix.platform }} =~ os3-68020|os3-68060 ]]; then COMPILER=adtools-m68k-amigaos.tar.bz2 / ; fi
-        if [[ ${{ matrix.platform }} =~ os4 ]]; then COMPILER=adtools-ppc-amigaos-legacy.tar.bz2 / ; fi
-        if [[ ${{ matrix.platform }} =~ mos ]]; then COMPILER=adtools-ppc-morphos.tar.bz2 / ; fi
-        if [[ ${{ matrix.platform }} =~ aros-ppc ]]; then COMPILER=adtools-ppc-aros.tar.bz2 / ; fi
-        if [[ ${{ matrix.platform }} =~ aros-i386 ]]; then COMPILER=adtools-i386-aros.tar.bz2 / ; fi
-        if [[ ${{ matrix.platform }} =~ aros-x86_64 ]]; then COMPILER=adtools-x86_64-aros.tar.bz2 / ; fi
+        if [[ ${{ matrix.platform }} =~ os3-68020|os3-68060 ]]; then COMPILER=adtools-m68k-amigaos.tar.bz2 ; fi
+        if [[ ${{ matrix.platform }} =~ os4 ]]; then COMPILER=adtools-ppc-amigaos-legacy.tar.bz2 ; fi
+        if [[ ${{ matrix.platform }} =~ mos ]]; then COMPILER=adtools-ppc-morphos.tar.bz2 ; fi
+        if [[ ${{ matrix.platform }} =~ aros-ppc ]]; then COMPILER=adtools-ppc-aros.tar.bz2 ; fi
+        if [[ ${{ matrix.platform }} =~ aros-i386 ]]; then COMPILER=adtools-i386-aros.tar.bz2 ; fi
+        if [[ ${{ matrix.platform }} =~ aros-x86_64 ]]; then COMPILER=adtools-x86_64-aros.tar.bz2 ; fi
         curl -L ${{ env.ADTOOLS_DL_PATH }}/${{COMPILER}} | sudo tar xj -C /
           
     - name: Compile ${{ matrix.platform }} release
