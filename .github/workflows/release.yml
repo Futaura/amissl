@@ -45,7 +45,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 480
     needs: [ setup, build ]
-    
+    strategy:
+      fail-fast: false
+
     steps:
     - name: Setup dependencies
       run: |
@@ -77,7 +79,7 @@ jobs:
     - name: Build AmiSSL release archives
       run: |
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
-        make -j1 OS=os4 build_docs # this will probably regenerate the makefile and exit, so need to run twice
+        make -ij1 OS=os4 build_docs # this will probably regenerate the makefile and exit, so need to run twice
         make -j1 OS=os4 build_docs
         ./tools/mkrelease.sh
 
@@ -88,7 +90,7 @@ jobs:
     - name: Generate changelog
       if: false
       id: changelog
-      uses: metcalfc/changelog-generator@v4.3.1
+      uses: metcalfc/changelog-generator@v4.6.2
       with:
         myToken: ${{ secrets.GITHUB_TOKEN }}
 
