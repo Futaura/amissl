@@ -5,7 +5,6 @@ on:
   workflow_dispatch:
 
 env:
-  RUNNER: ubuntu-latest
   ADTOOLS_DL_PATH: https://github.com/adtools/adtools/releases/download/20170213
   ADTOOLS_UTILS_DL: https://github.com/adtools/adtools/releases/download/20220416/adtools-utils.tar.bz2
 
@@ -14,7 +13,7 @@ jobs:
   ## Setup
   setup:
     name: Setup Environment
-    runs-on: ${{ env.RUNNER }}
+    runs-on: ubuntu-latest
     outputs:
       osslversion: ${{ steps.setup.outputs.osslversion }}
       version: ${{ steps.setup.outputs.version }}
@@ -45,7 +44,7 @@ jobs:
   ## Create draft release
   release_draft:
     name: Create Draft Release
-    runs-on:  ${{ env.RUNNER }}
+    runs-on: ubuntu-latest
     timeout-minutes: 480
     needs: [ setup, build_os3_020, build_os3_060, build_os4 ]
     
@@ -143,7 +142,7 @@ jobs:
   ## Build
   build:
     name: Build
-    runs-on: ${{ env.RUNNER }}
+    runs-on: ubuntu-latest
     needs: setup
     timeout-minutes: 480
     strategy:
