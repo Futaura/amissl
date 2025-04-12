@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 
 env:
+  RUNNER: ubuntu-latest
   ADTOOLS_DL_PATH: https://github.com/adtools/adtools/releases/download/20170213
   ADTOOLS_UTILS_DL: https://github.com/adtools/adtools/releases/download/20220416/adtools-utils.tar.bz2
 
@@ -13,7 +14,7 @@ jobs:
   ## Setup
   setup:
     name: Setup Environment
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER }}
     outputs:
       osslversion: ${{ steps.setup.outputs.osslversion }}
       version: ${{ steps.setup.outputs.version }}
@@ -44,23 +45,12 @@ jobs:
   ## Create draft release
   release_draft:
     name: Create Draft Release
-    runs-on: ubuntu-latest
+    runs-on:  ${{ env.RUNNER }}
     timeout-minutes: 480
     needs: [ setup, build_os3_020, build_os3_060, build_os4 ]
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Download all builds
-      uses: actions/download-artifact@v4
-      with:
-        merge-multiple: true
-
     - name: Setup dependencies
-      if: false
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update -y -qq || true
@@ -77,9 +67,20 @@ jobs:
         #curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-i386-aros.tar.bz2 | sudo tar xj -C /
         #curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-x86_64-aros.tar.bz2 | sudo tar xj -C /
 
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download all builds
+      uses: actions/download-artifact@v4
+      with:
+        merge-multiple: true
+
     - name: Build AmiSSL release archives
       run: |
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
+        make -j1 OS=os4 build_docs
         ./tools/mkrelease.sh
 
     - name: Get previous tag
@@ -139,92 +140,48 @@ jobs:
         path: AmiSSL-${{ needs.setup.outputs.version }}-*
         name: release-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}
 
-  ## Build OS3 68020-40
-  build_os3_020:
-    name: Build OS3 68020
-    runs-on: ubuntu-latest
+  ## Build
+  build:
+    name: Build
+    runs-on: ${{ env.RUNNER }}
     needs: setup
     timeout-minutes: 480
     strategy:
       fail-fast: false
+      matrix:
+        #platform: [ os4, os3-68020, os3-68060, mos, aros-ppc, aros-i386, aros-x86_64 ]
+        platform: [ os4, os3-68020, os3-68060 ]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install adtools build env
+    - name: Setup dependencies
       run: |
-        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
-        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
-
-    - name: Compile release
-      timeout-minutes: 480
-      run: |
-        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:${PATH}
-        make -j1 OS=os3-68020 DEBUG=
-
-    - name: Upload build files as a workflow artifact
-      uses: actions/upload-artifact@v4
-      with:
-        path: build_os3-68020*
-        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os3-020
-
-  ## Build OS3 68060
-  build_os3_060:
-    name: Build OS3 68060
-    runs-on: ubuntu-latest
-    needs: setup
-    timeout-minutes: 480
-    strategy:
-      fail-fast: false
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+        sudo dpkg --add-architecture i386
+        sudo apt-get update -y -qq || true
+        sudo apt-get -qq install libc6:i386
+        sudo ln -s /usr/lib/x86_64-linux-gnu/libmpfr.so.6 /usr/lib/x86_64-linux-gnu/libmpfr.so.4
 
     - name: Install adtools build env
       run: |
         curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
-        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-m68k-amigaos.tar.bz2 | sudo tar xj -C /
-
-    - name: Compile release
+        if [[ ${{ matrix.platform }} =~ os3-68020|os3-68060 ]]; then COMPILER=adtools-m68k-amigaos.tar.bz2 / ; fi
+        if [[ ${{ matrix.platform }} =~ os4 ]]; then COMPILER=adtools-ppc-amigaos-legacy.tar.bz2 / ; fi
+        if [[ ${{ matrix.platform }} =~ mos ]]; then COMPILER=adtools-ppc-morphos.tar.bz2 / ; fi
+        if [[ ${{ matrix.platform }} =~ aros-ppc ]]; then COMPILER=adtools-ppc-aros.tar.bz2 / ; fi
+        if [[ ${{ matrix.platform }} =~ aros-i386 ]]; then COMPILER=adtools-i386-aros.tar.bz2 / ; fi
+        if [[ ${{ matrix.platform }} =~ aros-x86_64 ]]; then COMPILER=adtools-x86_64-aros.tar.bz2 / ; fi
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/${COMPILER} | sudo tar xj -C /
+          
+    - name: Compile ${{ matrix.platform } release
       timeout-minutes: 480
       run: |
-        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:${PATH}
-        make -j1 OS=os3-68060 DEBUG=
+        export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
+        make -j1 OS=${{ matrix.platform }} DEBUG=
 
-    - name: Upload build files as a workflow artifact
+    - name: Upload ${{ matrix.platform } build files as a workflow artifact
       uses: actions/upload-artifact@v4
       with:
-        path: build_os3-68060*
-        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os3-060
-
-  ## Build OS4
-  build_os4:
-    name: Build OS4 + Docs
-    runs-on: ubuntu-latest
-    needs: setup
-    timeout-minutes: 480
-    strategy:
-      fail-fast: false
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install adtools build env
-      run: |
-        curl -L ${{ env.ADTOOLS_UTILS_DL }} | sudo tar xj -C /
-        curl -L ${{ env.ADTOOLS_DL_PATH }}/adtools-ppc-amigaos-legacy.tar.bz2 | sudo tar xj -C /
-
-    - name: Compile release
-      timeout-minutes: 480
-      run: |
-        export PATH=/usr/local/amiga/bin:${PATH}
-        make -j1 OS=os4 DEBUG= all build_docs
-
-    - name: Upload build files as a workflow artifact
-      uses: actions/upload-artifact@v4
-      with:
-        path: build_os4*
-        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-os4
+        path: build_${{ matrix.platform }}*
+        name: build-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.GITHUB_SHA7 }}-${{ matrix.platform }}
