@@ -169,7 +169,7 @@ jobs:
         if [[ ${{ matrix.platform }} =~ aros-ppc ]]; then COMPILER=adtools-ppc-aros.tar.bz2 / ; fi
         if [[ ${{ matrix.platform }} =~ aros-i386 ]]; then COMPILER=adtools-i386-aros.tar.bz2 / ; fi
         if [[ ${{ matrix.platform }} =~ aros-x86_64 ]]; then COMPILER=adtools-x86_64-aros.tar.bz2 / ; fi
-        curl -L ${{ env.ADTOOLS_DL_PATH }}/${COMPILER} | sudo tar xj -C /
+        curl -L ${{ env.ADTOOLS_DL_PATH }}/${{COMPILER}} | sudo tar xj -C /
           
     - name: Compile ${{ matrix.platform }} release
       timeout-minutes: 480
