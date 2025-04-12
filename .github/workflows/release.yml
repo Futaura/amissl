@@ -79,9 +79,7 @@ jobs:
     - name: Build AmiSSL release archives
       run: |
         export PATH=/usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
-        #make -ij1 OS=os4 build_docs # this will probably regenerate the makefile and exit, so need to run twice
         (cd build_os4/openssl; ../../openssl/Configure amiga-os4; make -j1 build_generated_pods)
-        #make -j1 OS=os4 build_docs
         ./tools/mkrelease.sh
 
     - name: Get previous tag
