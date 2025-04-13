@@ -5,10 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-
-  ## Setup
   upload:
-    name: Check & Upload
+    name: Upload latest release to Aminet
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +17,7 @@ jobs:
         name: release-*
         name_is_regexp: true
 
-    - name: Identify & Upload
+    - name: Check version and upload
       run: |
         DIR=$(ls | grep release-)
         VERSION=$(echo $DIR | grep -oP "\-\K\d+\.\d+")
@@ -28,5 +26,5 @@ jobs:
           cd $DIR
           sudo apt install rename
           rename 's/(.*)-(\d+\.\d+)-(.*)(\.*)/$1-v5-$3/' *.*
-          curl -T "{$(echo *.lha *.readme | tr ' ' ',')}" -u aminet@futaura.uk:aminettest1234 ftp://mx.futaura.uk/new/
+          curl -T "{$(echo *.lha *.readme | tr ' ' ',')}" -u anonymous:oliver@amissl.org ftp://main.aminet.net/new/
         fi
