@@ -23,5 +23,5 @@ jobs:
       run: |
         DIR=$(ls | grep release-)
         VERSION=$(echo $DIR | grep -oP "\-\K\d+\.\d+")
-        AMINET_VERSION=${wget https://aminet.net/util/libs/AmiSSL-v5-SDK.readme | grep -oP "Version:\s+\K\d+\.\d+")
+        AMINET_VERSION=$(wget https://aminet.net/util/libs/AmiSSL-v5-SDK.readme | grep -oP "Version:\s+\K\d+\.\d+")
         echo "$AMINET_VERSION"
