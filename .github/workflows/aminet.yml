@@ -1,0 +1,24 @@
+# Upload latest AmiSSL release to Aminet
+name: Aminet Upload
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  ## Setup
+  upload:
+    name: Check & Upload
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download latest release
+      uses: dawidd6/action-download-artifact@v9
+      with:
+        workflow: release.yml
+        merge-multiple: true
+        name: release-*
+
+    - name: Build AmiSSL release archives
+      run: |
+         ls -las
