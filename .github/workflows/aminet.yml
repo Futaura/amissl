@@ -23,6 +23,6 @@ jobs:
       shell: bash
       run: |
          DIR=$(ls release-*)
-         echo $(DIR)
+         echo "$(DIR)"
          VERSION=$(echo $DIR | grep -oP "\-\K\d+\.\d+")
-         echo $(VERSION)
+         echo "$(VERSION)"
