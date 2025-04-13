@@ -24,4 +24,5 @@ jobs:
         DIR=$(ls | grep release-)
         VERSION=$(echo $DIR | grep -oP "\-\K\d+\.\d+")
         AMINET_VERSION=$(curl https://aminet.net/util/libs/AmiSSL-v5-SDK.readme | grep -oP "Version:\s+\K\d+\.\d+")
+        AMINET_VERSION="5.20"
         if $(dpkg --compare-versions $AMINET_VERSION "lt" $VERSION); then echo true; else echo false; fi
