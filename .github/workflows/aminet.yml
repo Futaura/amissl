@@ -25,5 +25,5 @@ jobs:
         VERSION=$(echo $DIR | grep -oP "\-\K\d+\.\d+")
         AMINET_VERSION=$(curl https://aminet.net/util/libs/AmiSSL-v5-SDK.readme | grep -oP "Version:\s+\K\d+\.\d+")
         if $(dpkg --compare-versions $AMINET_VERSION "lt" $VERSION); then
-          curl -T '$DIR/(*.lha|*.readme)' -u "aminet@futaura.uk:aminettest1234" ftp://futaura.uk/new
+          curl -T "$DIR/*" -u "aminet@futaura.uk:aminettest1234" ftp://futaura.uk/new
         fi
