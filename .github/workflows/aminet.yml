@@ -19,10 +19,10 @@ jobs:
         name: release-*
         name_is_regexp: true
 
-    - name: Build AmiSSL release archives
+    - name: Identify & Upload
       shell: bash
       run: |
          DIR=$(ls release-*)
-         echo "$(DIR)"
-         VERSION=$(ls release-* | grep -oP "\-\K\d+\.\d+")
-         echo "$(VERSION)"
+         echo "$DIR"
+         VERSION=$(echo $DIR -oP "\-\K\d+\.\d+")
+         echo "$VERSION"
