@@ -20,6 +20,7 @@ jobs:
         name_is_regexp: true
 
     - name: Build AmiSSL release archives
+      shell: bash
       run: |
          DIR=$(ls release-*)
          VERSION=$(echo $(DIR) | grep -oP "\-\K\d+\.\d+")
