@@ -18,6 +18,7 @@ jobs:
         workflow: release.yml
         merge-multiple: true
         name: release-*
+        name_is_regexp: true
 
     - name: Build AmiSSL release archives
       run: |
