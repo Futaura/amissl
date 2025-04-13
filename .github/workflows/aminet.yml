@@ -22,7 +22,7 @@ jobs:
     - name: Identify & Upload
       shell: bash
       run: |
-         DIR=$(ls release-*)
+         DIR=$(ls | grep release-)
          echo "$DIR"
-         VERSION=$(echo $DIR -oP "\-\K\d+\.\d+")
+         VERSION=$(echo $DIR | grep -oP "\-\K\d+\.\d+")
          echo "$VERSION"
