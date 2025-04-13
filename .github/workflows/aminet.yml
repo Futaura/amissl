@@ -26,6 +26,6 @@ jobs:
         AMINET_VERSION=$(curl https://aminet.net/util/libs/AmiSSL-v5-SDK.readme | grep -oP "Version:\s+\K\d+\.\d+")
         if $(dpkg --compare-versions $AMINET_VERSION "lt" $VERSION); then
           cd $DIR
-          prename 's/(.*)-(\d+\.\d+)-(.*)(\.*)/$1-v5-$3/' *.*
+          rename 's/(.*)-(\d+\.\d+)-(.*)(\.*)/$1-v5-$3/' *.*
           curl -T "{$(echo *.lha *.readme | tr ' ' ',')}" -u aminet@futaura.uk:aminettest1234 ftp://mx.futaura.uk/new/
         fi
