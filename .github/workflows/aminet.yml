@@ -12,14 +12,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Download latest release
+    - name: Download latest release files
       uses: dawidd6/action-download-artifact@v9
       with:
         workflow: release.yml
-        merge-multiple: true
         name: release-*
         name_is_regexp: true
 
     - name: Build AmiSSL release archives
       run: |
-         ls -las
+         DIR=$(ls release-*)
+         VERSION=$(echo $(DIR) | grep -oP "\-\K\d+\.\d+")
+         echo $(DIR)
+         echo $(VERSION)
