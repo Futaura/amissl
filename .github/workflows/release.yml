@@ -78,7 +78,7 @@ jobs:
 
     - name: Build AmiSSL release archives
       run: |
-        export PATH=~/git-tools/:usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
+        export PATH=/home/runner/work/amissl/git-tools:usr/local/amiga/bin:/opt/m68k-amigaos/bin:/opt/ppc-amigaos/bin:/opt/ppc-morphos/bin:${PATH}
         #git config --local diff.renameLimit 30000
         #sudo apt-get -qq install git-restore-mtime
         git clone https://github.com/MestreLion/git-tools.git
