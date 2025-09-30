@@ -44,7 +44,7 @@ jobs:
     name: Create Draft Release
     runs-on: ubuntu-latest
     timeout-minutes: 480
-    needs: [ setup, /*build*/ ]
+    needs: [ setup ]
     strategy:
       fail-fast: false
 
